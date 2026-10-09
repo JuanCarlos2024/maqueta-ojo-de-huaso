@@ -1,0 +1,14 @@
+node_modules
+dist
+*.local
+.vite
+
+# Los videos de prueba no se versionan
+*.mp4
+*.mov
+*.webm
+*.m4v
+videos/
+
+# Configuración local del editor / asistente
+.claude/
