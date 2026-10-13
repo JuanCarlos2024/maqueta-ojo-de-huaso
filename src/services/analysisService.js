@@ -94,3 +94,20 @@ export async function fetchHistorial(limite = 50) {
   }
   return response.json()
 }
+
+/** Elimina un análisis guardado (base de datos + video + imagen) en el backend. */
+export async function eliminarHistorial(id) {
+  let response
+  try {
+    response = await fetch(`${API_BASE_URL}/historial/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-API-Key': API_KEY },
+    })
+  } catch {
+    throw new AnalysisRequestError('No se pudo contactar al servidor para eliminar el análisis.')
+  }
+  if (!response.ok) {
+    throw new AnalysisRequestError(`No se pudo eliminar el análisis (${response.status}).`)
+  }
+  return response.json()
+}
