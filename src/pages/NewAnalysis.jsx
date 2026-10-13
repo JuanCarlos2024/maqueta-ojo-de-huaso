@@ -182,8 +182,10 @@ export default function NewAnalysis() {
           >
             {isAnalyzing ? (
               <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                Analizando…
+                <span className="text-lg animate-bounce" role="img" aria-label="Analizando">
+                  🐂
+                </span>
+                Analizando la atajada…
               </>
             ) : (
               <>
