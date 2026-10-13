@@ -65,3 +65,26 @@ export async function requestAnalysis(request) {
 
   return response.json()
 }
+/** URL del video anotado / imagen de un análisis guardado (incluye la API key como query param porque <video>/<img> no pueden mandar headers). */
+export function historialVideoUrl(id) {
+  return `${API_BASE_URL}/historial/${id}/video?api_key=${encodeURIComponent(API_KEY)}`
+}
+export function historialImagenUrl(id) {
+  return `${API_BASE_URL}/historial/${id}/imagen?api_key=${encodeURIComponent(API_KEY)}`
+}
+
+/** Trae el historial de análisis guardados en el backend. */
+export async function fetchHistorial(limite = 50) {
+  let response
+  try {
+    response = await fetch(`${API_BASE_URL}/historial?limite=${limite}`, {
+      headers: { 'X-API-Key': API_KEY },
+    })
+  } catch {
+    throw new AnalysisRequestError('No se pudo contactar al servidor para traer el historial.')
+  }
+  if (!response.ok) {
+    throw new AnalysisRequestError(`No se pudo cargar el historial (${response.status}).`)
+  }
+  return response.json()
+}
