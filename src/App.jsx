@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/layout/Layout.jsx'
 import Home from './pages/Home.jsx'
 import NewAnalysis from './pages/NewAnalysis.jsx'
+import GuardarAnalisis from './pages/GuardarAnalisis.jsx'
 
 export default function App() {
   return (
