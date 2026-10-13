@@ -163,3 +163,21 @@ export default function SavedAnalyses() {
                     )}
                     <button
                       type="button"
+                      onClick={() => handleEliminar(registro.id)}
+                      disabled={eliminando}
+                      title="Eliminar este análisis"
+                      className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {eliminando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+    </>
+  )
+}
