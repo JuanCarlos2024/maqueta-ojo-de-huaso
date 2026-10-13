@@ -5,7 +5,7 @@ import Logo from './Logo.jsx'
 const NAV_ITEMS = [
   { label: 'Inicio', to: '/', icon: Home, end: true },
   { label: 'Nuevo análisis', to: '/nuevo-analisis', icon: Plus },
-  { label: 'Análisis guardados', icon: FolderOpen, comingSoon: true },
+  { label: 'Análisis guardados', to: '/GuardarAnalisis'  ,icon: FolderOpen },
   { label: 'Ayuda', icon: HelpCircle, comingSoon: true },
 ]
 
