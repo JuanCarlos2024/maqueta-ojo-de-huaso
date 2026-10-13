@@ -96,3 +96,18 @@ body {
 .dual-range .range.unset::-moz-range-thumb {
   border-color: #94a3b8;
 }
+
+/* Entrada suave para la tarjeta de resultado del análisis. */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out;
+}
