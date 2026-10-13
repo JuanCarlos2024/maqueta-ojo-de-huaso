@@ -9,7 +9,8 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="nuevo-analisis" element={<NewAnalysis />} />
-        {/* Rutas futuras: "analisis-guardados", "ayuda" */}
+        <Route path="Analisis Guardados" element={<GuardarAnalisis/>}></>
+        {/* Ruta futura: "ayuda" */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
