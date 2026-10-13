@@ -14,7 +14,7 @@ export const ACCEPTED_EXTENSIONS = ['.mp4', '.m4v', '.webm', '.mov']
 export const ACCEPTED_MIME_TYPES = ['video/mp4', 'video/x-m4v', 'video/webm', 'video/quicktime']
 
 /** URL base de la API de análisis (desplegada en Render). */
-export const API_BASE_URL = 'https://model-ojo-huaso.onrender.com'
+export const API_BASE_URL = 'https://model-ojo-huaso-production.up.railway.app'
 
 /** Clave de autenticación de la API (ver Environment Variables en Render). */
 export const API_KEY = '43e5bee6b4e5c990330005dd02629012'
