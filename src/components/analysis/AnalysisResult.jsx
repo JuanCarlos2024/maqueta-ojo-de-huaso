@@ -2,6 +2,14 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import Badge from '../ui/Badge.jsx'
 import Card from '../ui/Card.jsx'
 
+/** Color del número de puntaje según su valor (de un vistazo, sin leer el texto). */
+const scoreColor = (puntaje) => {
+  if (puntaje >= 4) return 'text-emerald-600'
+  if (puntaje === 3) return 'text-blue-600'
+  if (puntaje === 2) return 'text-amber-600'
+  return 'text-slate-400'
+}
+
 /** Resultado del análisis devuelto por el backend (formato "resumen"). */
 export default function AnalysisResult({ result }) {
   if (!result) return null
@@ -20,6 +28,7 @@ export default function AnalysisResult({ result }) {
   return (
     <Card
       title="Resultado del análisis"
+      className="animate-fade-in-up"
       badge={
         <Badge variant={detectada ? 'success' : 'warning'}>{detectada ? 'Atajada detectada' : 'Sin detección'}</Badge>
       }
@@ -29,7 +38,7 @@ export default function AnalysisResult({ result }) {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs font-semibold text-slate-500">Puntaje recomendado</p>
-              <p className="mt-1 text-2xl font-extrabold text-navy">{puntaje ?? '—'}</p>
+              <p className={`mt-1 text-2xl font-extrabold ${scoreColor(puntaje)}`}>{puntaje ?? '—'}</p>
             </div>
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs font-semibold text-slate-500">Tipo de atajada</p>
