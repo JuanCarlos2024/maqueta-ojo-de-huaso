@@ -1,4 +1,6 @@
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Image as ImageIcon, Video } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { historialImagenUrl, historialVideoUrl } from '../../services/analysisService.js'
 import Badge from '../ui/Badge.jsx'
 import Card from '../ui/Card.jsx'
 
@@ -12,6 +14,10 @@ const scoreColor = (puntaje) => {
 
 /** Resultado del análisis devuelto por el backend (formato "resumen"). */
 export default function AnalysisResult({ result }) {
+  const videoRef = useRef(null)
+  const [vista, setVista] = useState(null) // null | 'video' | 'imagen'
+  const [camaraLenta, setCamaraLenta] = useState(true)
+
   if (!result) return null
 
   const {
@@ -23,7 +29,14 @@ export default function AnalysisResult({ result }) {
     confianza_tipo: confianzaTipo,
     justificacion,
     fundamento,
+    historial_id: historialId,
   } = result
+
+  const toggleVelocidad = () => {
+    const nuevaLenta = !camaraLenta
+    setCamaraLenta(nuevaLenta)
+    if (videoRef.current) videoRef.current.playbackRate = nuevaLenta ? 0.5 : 1
+  }
 
   return (
     <Card
@@ -65,6 +78,68 @@ export default function AnalysisResult({ result }) {
             <div className="flex gap-2 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
               <p>{justificacion || fundamento}</p>
+            </div>
+          )}
+
+          {historialId != null && (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVista(vista === 'video' ? null : 'video')}
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+                    vista === 'video'
+                      ? 'border-brand bg-brand-50 text-brand-600'
+                      : 'border-slate-300 text-slate-700 hover:border-slate-400'
+                  }`}
+                >
+                  <Video className="h-4 w-4" />
+                  Ver repetición en cámara lenta
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVista(vista === 'imagen' ? null : 'imagen')}
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors ${
+                    vista === 'imagen'
+                      ? 'border-brand bg-brand-50 text-brand-600'
+                      : 'border-slate-300 text-slate-700 hover:border-slate-400'
+                  }`}
+                >
+                  <ImageIcon className="h-4 w-4" />
+                  Ver imagen del momento
+                </button>
+              </div>
+
+              {vista === 'video' && (
+                <div className="space-y-2">
+                  <video
+                    ref={videoRef}
+                    key={historialId}
+                    src={historialVideoUrl(historialId)}
+                    controls
+                    autoPlay
+                    className="w-full rounded-xl bg-black"
+                    onLoadedMetadata={(e) => {
+                      e.currentTarget.playbackRate = camaraLenta ? 0.5 : 1
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleVelocidad}
+                    className="text-sm font-semibold text-brand hover:text-brand-600"
+                  >
+                    Velocidad: {camaraLenta ? '0.5x (cámara lenta)' : '1x (normal)'} — cambiar
+                  </button>
+                </div>
+              )}
+
+              {vista === 'imagen' && (
+                <img
+                  src={historialImagenUrl(historialId)}
+                  alt="Momento de la atajada"
+                  className="w-full rounded-xl bg-slate-100"
+                />
+              )}
             </div>
           )}
         </div>
