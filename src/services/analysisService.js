@@ -46,6 +46,12 @@ export async function requestAnalysis(request) {
 
   const formData = new FormData()
   formData.append('video', request.file, request.videoName)
+  if (typeof request.startSeconds === 'number') {
+    formData.append('inicio_segundos', String(request.startSeconds))
+  }
+  if (typeof request.endSeconds === 'number') {
+    formData.append('fin_segundos', String(request.endSeconds))
+  }
 
   let response
   try {
