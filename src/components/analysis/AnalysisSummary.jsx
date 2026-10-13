@@ -36,7 +36,7 @@ export default function AnalysisSummary({ file, duration, start, end, validation
             ],
             ['Tamaño del archivo', file ? formatBytes(file.size) : '—'],
             ['Duración total', duration ? formatTime(duration) : '—'],
-            ['Origen', file ? 'Archivo local (no se sube a ningún servidor)' : '—'],
+            ['Origen', file ? 'Archivo local(se guardara en la nube de la misma web)' : '—'],
           ]}
         />
       </Card>
