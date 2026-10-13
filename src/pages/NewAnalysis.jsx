@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Lightbulb, Loader2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Lightbulb } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AiModuleNotice from '../components/analysis/AiModuleNotice.jsx'
@@ -26,6 +26,35 @@ const toSeconds = (text) => {
   return value === null ? NaN : value
 }
 
+/** Mensajes que van rotando mientras se espera la respuesta del backend. */
+const ANALYZING_MESSAGES = [
+  'Buscando la atajada…',
+  'Revisando el momento…',
+  'Calculando el puntaje…',
+  'Verificando el tipo de atajada…',
+]
+
+/** Pequeño "ding" al terminar, sin depender de archivos de audio externos. */
+const playSuccessSound = () => {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    const ctx = new AudioCtx()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.15)
+    gain.gain.setValueAtTime(0.15, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.3)
+  } catch {
+    // Si el navegador bloquea audio sin interacción previa, simplemente no suena.
+  }
+}
+
 export default function NewAnalysis() {
   const navigate = useNavigate()
   const playerRef = useRef(null)
@@ -39,6 +68,8 @@ export default function NewAnalysis() {
   const [analysisStatus, setAnalysisStatus] = useState('idle')
   const [analysisResult, setAnalysisResult] = useState(null)
   const [analysisError, setAnalysisError] = useState('')
+  const [messageIndex, setMessageIndex] = useState(0)
+  const [progress, setProgress] = useState(0)
 
   const start = toSeconds(startText)
   const end = toSeconds(endText)
@@ -59,6 +90,25 @@ export default function NewAnalysis() {
       window.removeEventListener('drop', prevent)
     }
   }, [])
+
+  // Mensajes rotativos + barra de progreso simulada mientras se espera al backend.
+  useEffect(() => {
+    if (!isAnalyzing) {
+      setMessageIndex(0)
+      setProgress(0)
+      return
+    }
+    const messageTimer = setInterval(() => {
+      setMessageIndex((i) => (i + 1) % ANALYZING_MESSAGES.length)
+    }, 2200)
+    const progressTimer = setInterval(() => {
+      setProgress((p) => (p < 90 ? p + (90 - p) * 0.08 : p))
+    }, 300)
+    return () => {
+      clearInterval(messageTimer)
+      clearInterval(progressTimer)
+    }
+  }, [isAnalyzing])
 
   const handleSelectFile = (file) => {
     if (video.selectFile(file)) {
@@ -92,6 +142,7 @@ export default function NewAnalysis() {
       const result = await requestAnalysis(request)
       setAnalysisResult(result)
       setAnalysisStatus('success')
+      playSuccessSound()
     } catch (err) {
       if (err instanceof AiModuleUnavailableError) {
         setPendingRequest(request)
@@ -195,6 +246,18 @@ export default function NewAnalysis() {
             )}
           </button>
         </div>
+
+        {isAnalyzing && (
+          <div className="space-y-2 pb-2" aria-live="polite">
+            <p className="text-center text-sm font-medium text-slate-600">{ANALYZING_MESSAGES[messageIndex]}</p>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-brand transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {analysisStatus === 'error' && (
           <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
