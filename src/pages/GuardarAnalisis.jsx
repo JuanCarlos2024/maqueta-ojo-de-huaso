@@ -1,9 +1,15 @@
-import { AlertCircle, CalendarClock, Loader2, Video } from 'lucide-react'
+import { AlertCircle, CalendarClock, Loader2, Trash2, Video } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import PageHeader from '../components/layout/PageHeader.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Card from '../components/ui/Card.jsx'
-import { AnalysisRequestError, fetchHistorial, historialImagenUrl, historialVideoUrl } from '../services/analysisService.js'
+import {
+  AnalysisRequestError,
+  eliminarHistorial,
+  fetchHistorial,
+  historialImagenUrl,
+  historialVideoUrl,
+} from '../services/analysisService.js'
 
 /** Color del número de puntaje según su valor (consistente con AnalysisResult). */
 const scoreColor = (puntaje) => {
@@ -26,6 +32,7 @@ export default function SavedAnalyses() {
   const [registros, setRegistros] = useState([])
   const [error, setError] = useState('')
   const [abierto, setAbierto] = useState(null) // id del registro cuyo video se está mostrando
+  const [eliminandoId, setEliminandoId] = useState(null)
 
   useEffect(() => {
     let cancelado = false
@@ -45,6 +52,20 @@ export default function SavedAnalyses() {
       cancelado = true
     }
   }, [])
+
+  const handleEliminar = async (id) => {
+    if (!window.confirm('¿Eliminar este análisis? Esta acción no se puede deshacer.')) return
+    setEliminandoId(id)
+    try {
+      await eliminarHistorial(id)
+      setRegistros((prev) => prev.filter((r) => r.id !== id))
+      if (abierto === id) setAbierto(null)
+    } catch (err) {
+      window.alert(err instanceof AnalysisRequestError ? err.message : 'No se pudo eliminar el análisis.')
+    } finally {
+      setEliminandoId(null)
+    }
+  }
 
   return (
     <>
@@ -80,6 +101,7 @@ export default function SavedAnalyses() {
           {registros.map((registro) => {
             const detectada = Boolean(registro.detectada)
             const mostrandoVideo = abierto === registro.id
+            const eliminando = eliminandoId === registro.id
 
             return (
               <Card
@@ -127,21 +149,17 @@ export default function SavedAnalyses() {
                     <p className="text-xs text-slate-400">{formatFecha(registro.fecha)}</p>
                   </div>
 
-                  {detectada && (
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                      <span>
-                        <span className="text-xs font-semibold text-slate-500">Puntaje </span>
-                        <span className={`font-extrabold ${scoreColor(registro.puntaje)}`}>{registro.puntaje ?? '—'}</span>
-                      </span>
-                      <span className="truncate text-xs font-semibold text-slate-500">{registro.nombre_atajada}</span>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            )
-          })}
-        </div>
-      )}
-    </>
-  )
-}
+                  <div className="flex items-center justify-between gap-2">
+                    {detectada ? (
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                        <span>
+                          <span className="text-xs font-semibold text-slate-500">Puntaje </span>
+                          <span className={`font-extrabold ${scoreColor(registro.puntaje)}`}>{registro.puntaje ?? '—'}</span>
+                        </span>
+                        <span className="truncate text-xs font-semibold text-slate-500">{registro.nombre_atajada}</span>
+                      </div>
+                    ) : (
+                      <span />
+                    )}
+                    <button
+                      type="button"
